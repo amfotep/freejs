@@ -1,3 +1,4 @@
+
 const Middleware = require('./middlewares')
 
 class Router {
@@ -12,7 +13,7 @@ class Router {
             if (finalRoute[finalRoute.length - 1] == '/') {
                 finalRoute = finalRoute.substring(0, finalRoute.length - 1)
             }
-            console.log(iterator)
+            //console.log(iterator)
             this.PushRoute(finalRoute, iterator.handler, iterator.method, iterator.middlewares)
         }
     }
@@ -37,10 +38,10 @@ class Router {
     PushRoute = (url, handler, method, _middlewares)=> {
         const midd = Middleware()
 
-        console.log(_middlewares, "FF")
+        //console.log(_middlewares, "FF")
 
         for (const mid of _middlewares) {
-            midd.Add(mid)    
+            midd.Add(mid)
         }
 
         this.routes.push({url, handler, method, mid: midd, middlewares: _middlewares})

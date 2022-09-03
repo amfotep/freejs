@@ -4,7 +4,7 @@ class Response {
 
     constructor(_res, dirname, dir = 'pages') {
         this.res = _res
-        this.dirPages = dirname + '/' + dir + '/' 
+        this.dirPages = dirname + '/' + dir + '/'
         this.secureMode = false
     }
 
@@ -14,7 +14,7 @@ class Response {
     }
 
     /*SetDirPages(dirname, dir) {
-        this.dirPages = dirname + '/' + dir + '/' 
+        this.dirPages = dirname + '/' + dir + '/'
     }*/
 
     SendFile = (page, data = {})=> {
@@ -43,19 +43,19 @@ class Response {
         try {
 
             let html = fs.readFileSync(this.dirPages + page + '.html', 'utf-8')
-            
+
             let dataVars = []
 
             if (this.secureMode) {
                 dataVars = Object.keys(data)
-            } 
+            }
             else {
                 dataVars = this.GetTemplatesVars(html)
             }
 
             if(data != {}) {
 
-                console.log(dataVars)
+                //console.log(dataVars)
 
                 let reserved = ['if', 'each']
 
@@ -63,7 +63,7 @@ class Response {
 
                 for (const iterator of dataVars) {
                     let searchValue = "{$"+iterator+"$}"
-                    
+
                     if(reserved.includes(iterator)) {
                         thenBlock = {bool: true, sentence: [iterator, 0], validation: []}
                         continue
@@ -72,7 +72,7 @@ class Response {
                     if (thenBlock.bool) {
                         if (thenBlock.sentence[0] == 'if') {
                             if (thenBlock.sentence[1] == 0) {
-                                
+
                                 html = html.replace('{$if'+iterator+'$}', '')
 
                                 thenBlock.validation = iterator.trim().split(' ')
@@ -88,23 +88,23 @@ class Response {
                                 }
 
                                 let opHandler = ifStatements[thenBlock.validation[1]]
-                                
+
                                 if (opHandler != undefined) {
 
                                     let v1 = thenBlock.validation[0]
                                     if (v1[0] == '%') {
                                         v1 = data[thenBlock.validation[0].substring(1)]
-                                    } 
+                                    }
 
                                     let v2 = thenBlock.validation[2]
                                     if (v2[0] == '%') {
                                         v2 = data[thenBlock.validation[2].substring(1)]
-                                    } 
+                                    }
 
                                     if (!opHandler(v1, v2)) {
                                         html = html.replace(iterator, '')
                                     }
-                                } 
+                                }
 
                             }
 
@@ -113,7 +113,7 @@ class Response {
 
                         if (thenBlock.sentence[0] == 'each') {
                             if (thenBlock.sentence[1] == 0) {
-                                
+
                                 html = html.replace('{$each'+iterator+'$}', '')
 
                                 thenBlock.validation = iterator.trim().split(' ')
@@ -144,17 +144,18 @@ class Response {
                     }
 
                     //console.log(iterator.trim())
-                    
+
                     html = html.replace('{$endif$}', '')
+                    html = html.replace('{$$}', '')
                     html = html.replace('{$endeach$}', '')
                     html = html.replace(searchValue, data[iterator.trim()])
-    
+
                 }
 
             }
 
             this.res.write(html)
-            
+
         } catch (error) {
 
             console.log(error)
@@ -162,7 +163,7 @@ class Response {
             this.res.write('Server error: Page not found')
 
         }
-        
+
     }
 
     TemplateStatementProcess() {}
@@ -179,11 +180,11 @@ class Response {
                 let finish = ""
                 let data = ""
                 while (true) {
-                    
+
                     if (finish == "$}") {
                         break
                     }
-                    
+
                     if (r[index] == "$" || r[index] == "}") {
                         finish += r[index]
                     } else{
@@ -193,7 +194,7 @@ class Response {
                             thenBlock = true
                             data = ''
                         }
-                        
+
                         if (data == 'endif') {
                             arrData.push(data)
                             thenBlock = false
@@ -212,20 +213,20 @@ class Response {
                             data = ''
                         }
                     }
-                    
+
                     index++
                 }
 
                 if (data != '') arrData.push(data)
                 replaceData = ""
             }
-            
-        
+
+
             if (thenBlock == true) {
                 if (r[index] != '{' && r[index] != '$'){
                     thenString += r[index]
                 }
-                
+
                 if (r[index] == '{' && r[index+1] == '$') {
                     arrData.push(thenString.trim())
                     thenString = ''

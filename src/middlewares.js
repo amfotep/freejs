@@ -6,7 +6,7 @@ class Middleware {
     }
 
     Invoke(req, res) {
-        
+
         const next = () => {
             this.pointer++
 
@@ -28,7 +28,6 @@ class Middleware {
             this.actual(req, res, next)
         }
 
-       this.middlewares = []
        this.pointer = 0
     }
 

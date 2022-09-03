@@ -23,14 +23,25 @@ router.Get('/about', function (req, response) {
     next()
 }])
 
-router.Post('/', function (req, response) {
+router.Post('/', function (request, response) {
+    console.log(request.body)
     response.SendJson({data: 'ok', msg: 'This is a post route'})
 })
 
+function Middlewares(req, res, next) {
+    console.log(req.url)
+    next()
+}
+
+router.Get('/ok', function (req, response) {
+    response.SendFile('no', {titulo: 'pedro1', nombre:'pedro', moder: [1, 2, 'dato', 'variable', 'diff aso', 'jesus', 'maldita sea']})
+})
+
+//router.AddMiddleware(Middlewares)
 
 const app = FreeServer()
 
-app.GroupRoutes('/users', router)
+app.GroupRoutes('/rammus', router)
 
 app.SetDirPath(__dirname, 'pages')
 
