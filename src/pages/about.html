@@ -9,5 +9,25 @@
 <body>
     <h1>{$titulo$}</h1>
     <h2>{$data$}</h2>
+    {$if 1 eq 1$}
+    <h1>Bloque condicionado</h1>
+    {$endif$}
+
+    {$if ESTAESFREE.JS eq %titulo$}
+    <h1>Bloque condicionado negado</h1>
+    {$endif$}
+
+    {$if 1 eq 1$}
+    <h2>Paso la primera</h2>
+    {$if %hola neq %hola$}
+    <h2>Paso la segunda</h2>
+    {$endif$}
+
+    <ul>
+    {$each %my_arr in value$}
+        <li>value: %value</li>
+    {$endeach$}
+    </ul>
+
 </body>
 </html>

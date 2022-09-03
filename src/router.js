@@ -3,25 +3,29 @@ class Router {
         this.routes = []
     }
 
-    GroupRoutes(url, router) {
+    Group(url, router) {
         for (const iterator of router.routes) {
-            this.PushRoute(url + iterator.url, iterator.handler, iterator.method)
+            let finalRoute = url + iterator.url
+            if (finalRoute[finalRoute.length - 1] == '/') {
+                finalRoute = finalRoute.substring(0, finalRoute.length - 1)
+            }
+            this.PushRoute(finalRoute, iterator.handler, iterator.method)
         }
     }
 
-    GetRoute(url, handler) {
+    Get(url, handler) {
         this.PushRoute(url, handler, 'GET')
     }
 
-    PostRoute(url, handler) {
+    Post(url, handler) {
         this.PushRoute(url, handler, 'POST')
     }
 
-    PutRoute(url, handler) {
+    Put(url, handler) {
         this.PushRoute(url, handler, 'PUT')
     }
 
-    DeleteRoute(url, handler) {
+    Delete(url, handler) {
         this.PushRoute(url, handler, 'DELETE')
     }
 

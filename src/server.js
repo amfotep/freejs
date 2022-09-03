@@ -15,12 +15,12 @@ class AppServer {
         this.dirPages = dir
     }
 
-    SetRouter(router) {
-        this.Router = router
-    }
+    /*SetRouter(_router) {
+        this.Router = _router
+    }*/
 
-    GroupRoutes(url, router) {
-        this.Router.GroupRoutes(url, router)
+    GroupRoutes(url, _router) {
+        this.Router.Group(url, _router)
     }
 
     ListenAndServe(port, funcUp, funcError) {

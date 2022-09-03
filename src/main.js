@@ -12,22 +12,20 @@ const Router = require('./router')
 
 const router = Router()
 
-router.GetRoute('/', function (req, response) {
+router.Get('/', function (req, response) {
     response.SendFile('index')
 })
 
-router.GetRoute('/about', function (req, response) {
-    response.SendFile('about', {titulo:"ESTA ES FREE.JS", data: "Mas data"})
+router.Get('/about', function (req, response) {
+    response.SendFile('about', {titulo:"ESTAESFREE.JS", data: "Mas data", my_arr: ['pepe', 'marcos', 'pablo']})
 })
 
-router.PostRoute('/', function (req, response) {
+router.Post('/', function (req, response) {
     response.SendJson({data: 'ok', msg: 'This is a post route'})
 })
 
 
 const app = FreeServer()
-
-//app.SetRouter(router)
 
 app.GroupRoutes('/users', router)
 
@@ -36,4 +34,3 @@ app.SetDirPath(__dirname, 'pages')
 app.ListenAndServe(3000, ()=>{
     console.log('Server Init')
 })
-
