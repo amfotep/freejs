@@ -18,7 +18,10 @@ router.Get('/', function (req, response) {
 
 router.Get('/about', function (req, response) {
     response.SendFile('about', {titulo:"ESTAESFREE.JS", data: "Mas data", my_arr: ['pepe', 'marcos', 'pablo']})
-})
+}, [(req, res, next) => {
+    console.log(req.url)
+    next()
+}])
 
 router.Post('/', function (req, response) {
     response.SendJson({data: 'ok', msg: 'This is a post route'})

@@ -27,10 +27,13 @@ class AppServer {
         try {
 
             http.createServer((req ,res) => {
-                let handler = this.Router.GetRouteHandler(req.url, req.method)
+                this.Router.Middlewares.Invoke(req, res)
+                let handler = this.Router.GetRouteHandler(req.url, req.method, req, res)
+                //console.log(handler)
                 if ( handler != null && handler != undefined) {
                     let response = Response(res, this.dirPath, this.dirPages)
-                    handler(req, response)
+                    if (handler[1] != undefined) handler[1].Invoke(req, res)
+                    handler[0](req, response)
                 }
                 else {
                     res.write('Route: ' + req.url + ' not defined')
