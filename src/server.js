@@ -52,7 +52,17 @@ class AppServer {
                     
                     this.Router.Middlewares.Invoke(req, res)
                     //console.log(this.Router.Middlewares)
+                    if (req.url != '/favicon.ico') {
+                        let query = req.url.slice(req.url.indexOf('?') + 1,)
+
+                        if (query != -1 && query != req.url) {
+                            request.query = {}
+                            req.url = req.url.slice(0, req.url.indexOf('?'))
+                        }
+
+                    }
                     let handler = this.Router.GetRouteHandler(req.url, req.method)
+
                     //console.log(handler)
                     //console.log(request.body)
                     if ( (handler != null && handler != undefined) && (handler[0] != null && handler[0] != undefined) ) { 

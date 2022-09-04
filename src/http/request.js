@@ -9,6 +9,7 @@ class Request {
 
     BodyJSON() {
         try {
+            // TEST ERRORS WITHOUT BODY
             let string = this.body.replace(/:/g, '":"')
             string = string.replace(/\s/g, '')
             string = string.replace(/{/g, '{"')
@@ -23,6 +24,24 @@ class Request {
 
         } catch (error) {
             throw Error('Format error with body' + error)
+        }
+    }
+
+    QueryParser() {
+        try {
+            if(Object.keys(this.query).length === 0) {
+                return null
+            }
+            let string = this.query.replace(/&/g, '","')
+            string = string.replace(/\s/g, '')
+            string = string.replace(/=/g, '":"')
+            string = `{"${string}"}`
+
+            let json = JSON.parse(string)
+            return json
+
+        } catch (error) {
+            throw Error('Format error with query' + error)
         }
     }
 
@@ -46,6 +65,10 @@ class Request {
         let strategy = {
             JSON: () => this.BodyJSON(),
             BODY_PARSER: () => this.BodyParser()
+        }
+
+        if(this.body.length === 0) {
+            return null
         }
 
         for (let index = 0; index < this.body.length; index++) {

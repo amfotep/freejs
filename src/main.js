@@ -43,6 +43,10 @@ router.Get('/ok', function (req, response) {
     response.Render('no', {titulo: 'pedro1', nombre:'pedro', moder: [1, 2, 'dato', 'variable', 'diff aso', 'jesus', 'maldita sea']})
 })
 
+router.Get('/module', function (req, response) {
+    response.Render('module')
+})
+
 //router.AddMiddleware(Middlewares)
 
 const app = FreeServer()

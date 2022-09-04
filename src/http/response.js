@@ -6,12 +6,15 @@ class Response {
         this.res = _res
         this.dirPages = dirname + '/' + dir + '/'
         this.secureMode = false
+        this.importData = []
     }
 
     SendJson(data) {
         this.res.setHeader('Content-Type', 'application/json');
         this.res.write(JSON.stringify(data))
     }
+
+
 
     /*SetDirPages(dirname, dir) {
         this.dirPages = dirname + '/' + dir + '/'
@@ -41,29 +44,40 @@ class Response {
         }
 
         try {
-
+            
             let html = fs.readFileSync(this.dirPages + page + '.html', 'utf-8')
 
-            let dataVars = []
+            this.SearchExportsRender()
 
+            
+            let dataVars = []
+            
             if (this.secureMode) {
                 dataVars = Object.keys(data)
             }
             else {
                 dataVars = this.GetTemplatesVars(html)
             }
+            
+            html = this.WriteImports(html, dataVars)
+
+            //console.log(html)
 
             if(data != {}) {
 
                 //console.log(dataVars)
 
+                let temp = []
+
                 let reserved = ['if', 'each']
 
                 let thenBlock = {bool: false, sentence: "", validation: []}
 
+                //console.log(dataVars)
+
                 for (const iterator of dataVars) {
                     let searchValue = "{$"+iterator+"$}"
-
+                    //console.log(iterator)
                     if(reserved.includes(iterator)) {
                         thenBlock = {bool: true, sentence: [iterator, 0], validation: []}
                         continue
@@ -120,6 +134,7 @@ class Response {
 
                                 thenBlock.sentence[1] = 1
 
+                            
                                 continue
                             }
                             else {
@@ -129,6 +144,7 @@ class Response {
                                 }
 
                                 let arr = data[thenBlock.validation[0].substring(1)]
+
 
                                 if (arr == undefined) arr = [undefined]
 
@@ -141,6 +157,7 @@ class Response {
                                 html = html.replace(iterator, strData)
                             }
                         }
+
                     }
 
                     //console.log(iterator.trim())
@@ -148,6 +165,8 @@ class Response {
                     html = html.replace('{$endif$}', '')
                     html = html.replace('{$$}', '')
                     html = html.replace('{$endeach$}', '')
+                    html = html.replace('{$endexport$}', '')
+                    html = html.replace('{$endimport$}', '')
                     html = html.replace(searchValue, data[iterator.trim()])
 
                 }
@@ -162,6 +181,117 @@ class Response {
             this.res.writeHeader(500)
             this.res.write('Server error: Page not found')
 
+        }
+
+    }
+
+    WriteImports(html, dataVars) {
+
+        let reserved = ['import']
+
+        let thenBlock = {bool: false, sentence: "", validation: []}
+
+        for (const iterator of dataVars) {
+            let searchValue = "{$"+iterator+"$}"
+            
+            if(reserved.includes(iterator)) {
+                thenBlock = {bool: true, sentence: [iterator, 0], validation: []}
+                continue
+            }
+
+            if (thenBlock.bool) {
+                if (thenBlock.sentence[0] == 'import') {
+                    if (thenBlock.sentence[1] == 0) {
+
+                        thenBlock.validation = iterator.trim().split(' ')
+
+                        //console.log(iterator)
+
+                        thenBlock.sentence[1] = 1
+
+                        continue
+                    }
+                    else {
+                        if (iterator == 'endimport') {
+                            thenBlock = {bool: false, sentence: "", validation: []}
+                            continue
+                        }
+                        
+                        if(this.importData[thenBlock.validation] != undefined) {
+                            //console.log('FFFFFFFFF', thenBlock.validation)
+                            html = html.replace('{$import '+thenBlock.validation+'$}', this.importData[thenBlock.validation][0])
+                        }
+
+                    }
+                }
+            }
+
+            //console.log(searchValue)
+        }
+
+        return html
+
+    }
+
+    SearchExportsRender() {
+        
+        try {
+            let exportsHTML = fs.readdirSync(this.dirPages + 'exports/')
+
+            for (const htmlName of exportsHTML) {
+                let html = fs.readFileSync(this.dirPages + 'exports/' + htmlName, 'utf-8')
+
+                let dataVars = []
+        
+                dataVars = this.GetTemplatesVars(html)
+
+                let temp = []
+
+                let reserved = ['export', 'import']
+
+                let thenBlock = {bool: false, sentence: "", validation: []}
+
+                for (const iterator of dataVars) {
+                    let searchValue = "{$"+iterator+"$}"
+
+                    if(reserved.includes(iterator)) {
+                        thenBlock = {bool: true, sentence: [iterator, 0], validation: []}
+                        continue
+                    }
+
+                    if (thenBlock.bool) {
+                        if (thenBlock.sentence[0] == 'export') {
+                            if (thenBlock.sentence[1] == 0) {
+
+                                html = html.replace('{$export'+iterator+'$}', '')
+
+                                thenBlock.validation = iterator.trim()
+
+                                thenBlock.sentence[1] = 1
+
+                                continue
+                            }
+                            else {
+                                if (iterator == 'endexport') {
+                                    this.importData[thenBlock.validation] = temp
+                                    //console.log(this.importData)
+                                    temp = []
+                                    thenBlock = {bool: false, sentence: "", validation: []}
+                                    continue
+                                }
+
+                                temp.push(iterator)
+
+                            }
+                        }
+                    }
+                    
+                }
+
+            }
+
+        } catch (error) {
+            throw Error(error)
         }
 
     }
@@ -195,6 +325,7 @@ class Response {
                             data = ''
                         }
 
+                        
                         if (data == 'endif') {
                             arrData.push(data)
                             thenBlock = false
@@ -209,7 +340,33 @@ class Response {
 
                         if (data == 'endeach') {
                             arrData.push(data)
+                            thenBlock = false
+                            data = ''
+                        }
+                        
+                        if (data == 'export') {
+                            arrData.push(data)
                             thenBlock = true
+                            data = ''
+                        }
+
+                        
+
+                        if (data == 'endexport') {
+                            arrData.push(data)
+                            thenBlock = false
+                            data = ''
+                        }
+
+                        if (data == 'import') {
+                            arrData.push(data)
+                            thenBlock = true
+                            data = ''
+                        }
+
+                        if (data == 'endimport') {
+                            arrData.push(data)
+                            thenBlock = false
                             data = ''
                         }
                     }
