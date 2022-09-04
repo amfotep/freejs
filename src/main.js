@@ -13,18 +13,18 @@ const Router = require('./router')
 const router = Router()
 
 router.Get('/', function (req, response) {
-    response.SendFile('index')
+    response.Render('index')
 })
 
 router.Get('/about', function (req, response) {
-    response.SendFile('about', {titulo:"ESTAESFREE.JS", data: "Mas data", my_arr: ['pepe', 'marcos', 'pablo']})
+    response.Render('about', {titulo:"ESTAESFREE.JS", data: "Mas data", my_arr: ['pepe', 'marcos', 'pablo']})
 }, [(req, res, next) => {
     console.log(req.url)
     next()
 }])
 
 router.Post('/', function (request, response) {
-    console.log(request.body)
+    console.log(request.Body())
     response.SendJson({data: 'ok', msg: 'This is a post route'})
 })
 
@@ -33,8 +33,14 @@ function Middlewares(req, res, next) {
     next()
 }
 
+//BUG: THE HANDLER FUNC INCOMPLETE
+router.Get('/params/[id]/products/[prod]', (req, res) => {
+    console.log(req.Params())
+    res.SendJson({param: req.Params()})
+})
+
 router.Get('/ok', function (req, response) {
-    response.SendFile('no', {titulo: 'pedro1', nombre:'pedro', moder: [1, 2, 'dato', 'variable', 'diff aso', 'jesus', 'maldita sea']})
+    response.Render('no', {titulo: 'pedro1', nombre:'pedro', moder: [1, 2, 'dato', 'variable', 'diff aso', 'jesus', 'maldita sea']})
 })
 
 //router.AddMiddleware(Middlewares)

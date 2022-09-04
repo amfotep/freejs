@@ -17,7 +17,7 @@ class Response {
         this.dirPages = dirname + '/' + dir + '/'
     }*/
 
-    SendFile = (page, data = {})=> {
+    Render = (page, data = {})=> {
 
         const ifStatements = {
             'eq': (v1, v2) => {

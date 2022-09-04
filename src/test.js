@@ -1,11 +1,42 @@
-const Middleware = require('./middlewares')
+/*let url = '/params/[id]/products/[product]'
+//let newURL = url
+let arrData = []
 
-const mid = Middleware()
+for (let index = 0; index < url.length; index++) {
+    if (url[index] == '[') {
+        let data = ''
 
-mid.Add((req, res, next)=> {
-    console.log(req)
-    console.log(res)
-    next()
-})
+        while (true) {
+            data += url[index]
 
-mid.Invoke("a", "b")
+            if (url[index] == ']') {
+                break
+            }
+            index++
+        }
+        arrData.push(data)
+        data = ''
+    }
+}
+
+/* IMPLEMENT
+for (const params of arrData) {
+    url = url.replace('/' + params, '')
+}
+*/
+
+/*let arrURL = url.split('/')
+let arrPositionParams = []
+
+for (const urlParams of arrData) {
+    arrPositionParams.push(arrURL.indexOf(urlParams))
+}
+
+
+console.log(arrPositionParams)
+*/
+//console.log(arrData)
+
+arr = [1,2,3]
+
+console.log(arr.includes([1,2]))

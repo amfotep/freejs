@@ -9,12 +9,20 @@ class AppServer {
         this.Router = Router()
         this.dirPath = 'NOT_PATH_INCLUDED'
         this.dirPages = 'NOT_PAGE_DIR_INCLUDED'
+        //this.parseDataFormat = []
     }
 
     SetDirPath(path, dir) {
         this.dirPath = path
         this.dirPages = dir
     }
+
+    /*SetRequestFormat(str) {
+        if (str == 'JSON' || str == 'BODY_PARSER')
+            this.parseDataFormat.push(str)
+        else 
+            throw Error(str + ' not is posible, only (JSON, BODY-PARSER)')
+    }*/
 
     /*SetRouter(_router) {
         this.Router = _router
@@ -38,26 +46,36 @@ class AppServer {
                     request.body.push(buffer)
                 })
 
-                request.req.on('end', ()=>{
+                request.req.on('end', () => {
+
                     request.body = Buffer.concat(request.body).toString()
-                    console.log(request.body)
+                    
+                    this.Router.Middlewares.Invoke(req, res)
+                    //console.log(this.Router.Middlewares)
+                    let handler = this.Router.GetRouteHandler(req.url, req.method)
+                    //console.log(handler)
+                    //console.log(request.body)
+                    if ( (handler != null && handler != undefined) && (handler[0] != null && handler[0] != undefined) ) { 
+                        let response = Response(res, this.dirPath, this.dirPages)
+                        
+                        let params = handler[2]
+                        
+                        request.params = params
+
+                        if (handler[1] != undefined) {
+                            handler[1].Invoke(request, response)
+                        }
+                        
+                        //console.log(handler)
+                        handler[0](request, response)
+                    }
+                    else {
+                        res.write('Route: ' + req.url + ' not defined')
+                    }
+    
+                    res.end()
                 })
 
-                this.Router.Middlewares.Invoke(req, res)
-                //console.log(this.Router.Middlewares)
-                let handler = this.Router.GetRouteHandler(req.url, req.method, req, res)
-                //console.log(handler)
-                console.log(request.body)
-                if ( handler != null && handler != undefined) {
-                    let response = Response(res, this.dirPath, this.dirPages)
-                    if (handler[1] != undefined) handler[1].Invoke(request, res)
-                    handler[0](request, response)
-                }
-                else {
-                    res.write('Route: ' + req.url + ' not defined')
-                }
-
-                res.end()
             }).listen(port)
 
             funcUp()
